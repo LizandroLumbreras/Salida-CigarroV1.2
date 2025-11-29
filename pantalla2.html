@@ -195,4 +195,72 @@ function mostrarMarcas() {
 function mostrarProductos(marca) {
   document.getElementById("pantalla").style.display = "none";
 
-  const lista = document.getElementById("listaProductos"
+  const lista = document.getElementById("listaProductos");
+  lista.innerHTML = "";
+
+  const listaMarca = mapaMarcas[marca].sort((a, b) =>
+    a.descripcion.localeCompare(b.descripcion)
+  );
+
+  listaMarca.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "producto";
+    div.textContent = p.descripcion;
+    div.onclick = () => abrirPopup(p);
+    lista.appendChild(div);
+  });
+
+  document.getElementById("tituloMarca").textContent = marca;
+  document.getElementById("productos").style.display = "block";
+}
+
+// =============================
+//     POPUP AGREGAR CANTIDAD
+// =============================
+let productoSeleccionado = null;
+
+function abrirPopup(producto) {
+  productoSeleccionado = producto;
+  document.getElementById("nombreProductoSeleccionado").textContent =
+    producto.descripcion;
+  document.getElementById("inputCantidad").value = '';
+  document.getElementById("popupCantidad").style.display = "block";
+}
+
+function cerrarPopup() {
+  document.getElementById("popupCantidad").style.display = "none";
+}
+
+function confirmarCantidad() {
+  const cantidad = parseFloat(document.getElementById("inputCantidad").value);
+
+  if (isNaN(cantidad) || cantidad <= 0) {
+    alert("Cantidad inválida");
+    return;
+  }
+
+  let carrito = JSON.parse(localStorage.getItem("carrito_cigarro")) || [];
+
+  carrito.push({
+    codigo: productoSeleccionado.codigo,
+    descripcion: productoSeleccionado.descripcion,
+    marca: productoSeleccionado.marca,
+    unidad: productoSeleccionado.unidad,
+    cantidad: cantidad
+  });
+
+  localStorage.setItem("carrito_cigarro", JSON.stringify(carrito));
+
+  cerrarPopup();
+  window.location.href = "pantalla3.html";
+}
+
+window.cerrarPopup = cerrarPopup;
+window.confirmarCantidad = confirmarCantidad;
+
+// CARGA INICIAL
+cargarProductos();
+</script>
+
+</body>
+</html>
