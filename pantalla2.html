@@ -250,8 +250,14 @@ function confirmarCantidad() {
   });
 
   localStorage.setItem("carrito_cigarro", JSON.stringify(carrito));
+const folio = localStorage.getItem("folioSalidaCigarro");
 
+localStorage.setItem(
+  "folioSalidaCigarro",
+  folio
+);
   cerrarPopup();
+  
   window.location.href = "pantalla3.html";
 }
 
