@@ -91,20 +91,32 @@
     const db = firebase.firestore();
 
     // 🔎 Solo LEE el consecutivo y muestra el próximo (no lo incrementa)
-    async function cargarFolio(){
-      try{
-        const docRef = db.collection("consecutivos").doc("salidas_cigarro");
-        const snap = await docRef.get();
-        const ultimo = snap.exists ? Number(snap.data().ultimo || 0) : 0;
-        const proximo = ultimo + 1; // ← PROXIMO folio, no el actual
-        const folio = "SAL-CIG-" + String(proximo).padStart(4,"0");
-        document.getElementById("proximoFolio").textContent = folio;
-      }catch(e){
-        console.error(e);
-        document.getElementById("proximoFolio").textContent = "N/D";
-      }
-    }
+function generarFolioAutomatico(){
 
+  const ahora = new Date();
+
+  const yyyy = ahora.getFullYear();
+
+  const mm = String(ahora.getMonth() + 1).padStart(2, "0");
+
+  const dd = String(ahora.getDate()).padStart(2, "0");
+
+  const hh = String(ahora.getHours()).padStart(2, "0");
+
+  const min = String(ahora.getMinutes()).padStart(2, "0");
+
+  const ss = String(ahora.getSeconds()).padStart(2, "0");
+
+  // ejemplo:
+  // SAL-CIG-20260523-131530
+
+  const folio = `SAL-CIG-${yyyy}${mm}${dd}-${hh}${min}${ss}`;
+
+  document.getElementById("proximoFolio").textContent = folio;
+
+  // guardar temporalmente
+  localStorage.setItem("folioSalidaCigarro", folio);
+}
     function ponerFechaHoy(){
       const hoy = new Date(); const yyyy = hoy.getFullYear();
       const mm = String(hoy.getMonth()+1).padStart(2,'0');
@@ -132,7 +144,13 @@
     }
 
     document.getElementById("btnContinuar").addEventListener("click", continuar);
-    document.addEventListener("DOMContentLoaded", ()=>{cargarFolio();ponerFechaHoy();});
+    document.addEventListener("DOMContentLoaded", ()=>{
+
+  generarFolioAutomatico();
+
+  ponerFechaHoy();
+
+});
   </script>
 </body>
 </html>
