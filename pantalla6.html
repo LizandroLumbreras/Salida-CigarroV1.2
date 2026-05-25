@@ -155,18 +155,27 @@ $entrega.textContent=datos.entrega||'';$recibe.textContent=datos.recibe||'';$des
 /* ================== BASE CONFIG ================== */
 const TOKEN="8495270080:AAFBJ8Vxi6ZhqP6ghtJqMal9RZFz3YJBpo8";
 const CHAT_ID="6617988297";
-const COL_CONSEC='consecutivos';
-const DOC_CONSEC='salidas_cigarro';
-const pad4=n=>String(n).padStart(4,'0');
 
 /* ================== FUNCIONES ================== */
-async function nextFolio(){
-  const ref=db.collection(COL_CONSEC).doc(DOC_CONSEC);
-  const snap=await ref.get();
-  const cur=snap.exists ? (snap.data().ultimo||0) : 0;
-  const nxt=cur+1;
-  await ref.set({ultimo:nxt},{merge:true});
-  return `SAL-CIG-${pad4(nxt)}`;
+function nextFolio(){
+
+  const ahora = new Date();
+
+  const yyyy = ahora.getFullYear();
+
+  const mm = String(ahora.getMonth() + 1).padStart(2, "0");
+
+  const dd = String(ahora.getDate()).padStart(2, "0");
+
+  const hh = String(ahora.getHours()).padStart(2, "0");
+
+  const min = String(ahora.getMinutes()).padStart(2, "0");
+
+const ss = String(ahora.getSeconds()).padStart(2, "0");
+
+const ms = String(ahora.getMilliseconds()).padStart(3, "0");
+
+return `SAL-CIG-${yyyy}${mm}${dd}-${hh}${min}${ss}${ms}`;
 }
 
 async function enviarSalidaTelegram(salida){
@@ -275,7 +284,7 @@ async function verificarInventarioYNotificar(productos){
 
 /* ================== GUARDAR SALIDA (Ajustado a salidas1.0) ================== */
 async function guardarSalida(){
-  const folio = await nextFolio();
+  const folio = nextFolio();
   $folio.textContent = folio;
 
   const firmaEntregaFinal = localStorage.getItem('firma_entrega_cigarro') || firmaEntregaB64 || '';
@@ -290,7 +299,8 @@ async function guardarSalida(){
     productos: productos || [],
     firmaEntrega: firmaEntregaFinal,
     firmaRecibe: firmaRecibeFinal,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+createdAt: new Date().toISOString()
   };
 
   /* 🔥 AQUÍ EL AJUSTE IMPORTANTE 🔥 */
